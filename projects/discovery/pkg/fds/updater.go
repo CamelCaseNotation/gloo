@@ -7,6 +7,8 @@ import (
 	"sync"
 	"sync/atomic"
 
+	gateway_v1 "github.com/solo-io/gloo/projects/gateway/pkg/api/v1"
+
 	"github.com/gogo/protobuf/proto"
 
 	"github.com/solo-io/go-utils/contextutils"
@@ -25,6 +27,11 @@ type UpstreamWriterClient interface {
 	Read(namespace, name string, opts clients.ReadOpts) (*v1.Upstream, error)
 }
 
+type VirtualServiceWriterClient interface {
+	Write(resource *gateway_v1.VirtualService, opts clients.WriteOpts) (*gateway_v1.VirtualService, error)
+	Read(namespace, name string, opts clients.ReadOpts) (*gateway_v1.VirtualService, error)
+}
+
 type updaterUpdater struct {
 	cancel            context.CancelFunc
 	ctx               context.Context
@@ -41,7 +48,8 @@ type Updater struct {
 	resolver          Resolver
 	logger            *zap.SugaredLogger
 
-	upstreamWriter UpstreamWriterClient
+	upstreamWriter       UpstreamWriterClient
+	virtualServiceWriter VirtualServiceWriterClient
 
 	maxInParallelSemaphore chan struct{}
 
@@ -62,7 +70,7 @@ func getConcurrencyChan(maxoncurrency uint) chan struct{} {
 
 }
 
-func NewUpdater(ctx context.Context, resolver Resolver, upstreamclient UpstreamWriterClient, maxconncurrency uint, functionalPlugins []FunctionDiscoveryFactory) *Updater {
+func NewUpdater(ctx context.Context, resolver Resolver, upstreamclient UpstreamWriterClient, virtualServiceClient VirtualServiceWriterClient, maxconncurrency uint, functionalPlugins []FunctionDiscoveryFactory) *Updater {
 	ctx = contextutils.WithLogger(ctx, "function-discovery-updater")
 	return &Updater{
 		logger:                 contextutils.LoggerFrom(ctx),
@@ -72,6 +80,7 @@ func NewUpdater(ctx context.Context, resolver Resolver, upstreamclient UpstreamW
 		activeupstreams:        make(map[core.ResourceRef]*updaterUpdater),
 		maxInParallelSemaphore: getConcurrencyChan(maxconncurrency),
 		upstreamWriter:         upstreamclient,
+		virtualServiceWriter:   virtualServiceClient,
 	}
 }
 
@@ -187,6 +196,13 @@ func (u *updaterUpdater) saveUpstream(mutator UpstreamMutator) error {
 		u.upstream = newupstream
 	}
 	// TODO: if write failed, we are retrying. we should consider verifying that the error is indeed due to resource conflict,
+
+	// TODO(kdorosh) write virtual service if non-nil vs client & rename this function
+	if u.parent.virtualServiceWriter != nil {
+
+		u.parent.virtualServiceWriter.Write()
+
+	}
 
 	return nil
 }
