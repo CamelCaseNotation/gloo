@@ -153,7 +153,7 @@ func stripInvalidListenersAndVirtualHosts(ctx context.Context, proxiesToWrite Ge
 
 		for _, lis := range proxy.Listeners {
 
-			if httpListenerType, ok := lis.ListenerType.(*gloov1.Listener_HttpListener); ok {
+			if lis.HttpListener != nil {
 				var validVhosts []*gloov1.VirtualHost
 
 				if err := forEachVhost(lis, reports, func(vhost *gloov1.VirtualHost, accepted bool) {
@@ -170,7 +170,7 @@ func stripInvalidListenersAndVirtualHosts(ctx context.Context, proxiesToWrite Ge
 					return validVhosts[i].Name < validVhosts[j].Name
 				})
 
-				httpListenerType.HttpListener.VirtualHosts = validVhosts
+				lis.HttpListener.VirtualHosts = validVhosts
 			}
 		}
 

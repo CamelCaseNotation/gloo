@@ -42,11 +42,7 @@ func (p *Plugin) ProcessListener(params plugins.Params, in *v1.Listener, out *en
 	if alSettings.AccessLoggingService == nil {
 		return nil
 	}
-	switch listenerType := in.GetListenerType().(type) {
-	case *v1.Listener_HttpListener:
-		if listenerType.HttpListener == nil {
-			return nil
-		}
+	if in.HttpListener != nil {
 		for _, f := range out.FilterChains {
 			for i, filter := range f.Filters {
 				if filter.Name == util.HTTPConnectionManager {
@@ -72,10 +68,9 @@ func (p *Plugin) ProcessListener(params plugins.Params, in *v1.Listener, out *en
 				}
 			}
 		}
-	case *v1.Listener_TcpListener:
-		if listenerType.TcpListener == nil {
-			return nil
-		}
+	}
+
+	if in.TcpListener != nil {
 		for _, f := range out.FilterChains {
 			for i, filter := range f.Filters {
 				if filter.Name == util.TCPProxy {

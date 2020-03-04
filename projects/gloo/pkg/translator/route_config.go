@@ -64,11 +64,10 @@ func (t *translatorInstance) computeRouteConfig(params plugins.Params, proxy *v1
 }
 
 func (t *translatorInstance) computeVirtualHosts(params plugins.Params, proxy *v1.Proxy, listener *v1.Listener, httpListenerReport *validationapi.HttpListenerReport) []*envoyroute.VirtualHost {
-	httpListener, ok := listener.ListenerType.(*v1.Listener_HttpListener)
-	if !ok {
+	if listener.HttpListener == nil {
 		return nil
 	}
-	virtualHosts := httpListener.HttpListener.VirtualHosts
+	virtualHosts := listener.HttpListener.VirtualHosts
 	ValidateVirtualHostDomains(virtualHosts, httpListenerReport)
 	requireTls := len(listener.SslConfigurations) > 0
 	var envoyVirtualHosts []*envoyroute.VirtualHost

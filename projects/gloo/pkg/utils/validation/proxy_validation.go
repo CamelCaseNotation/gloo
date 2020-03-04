@@ -14,12 +14,10 @@ func MakeReport(proxy *v1.Proxy) *validation.ProxyReport {
 	listenerReports := make([]*validation.ListenerReport, len(listeners))
 
 	for i, listener := range listeners {
-		switch listenerType := listener.GetListenerType().(type) {
-		case *v1.Listener_HttpListener:
+		if listener.HttpListener != nil {
+			vhostReports := make([]*validation.VirtualHostReport, len(listener.HttpListener.GetVirtualHosts()))
 
-			vhostReports := make([]*validation.VirtualHostReport, len(listenerType.HttpListener.GetVirtualHosts()))
-
-			for j, vh := range listenerType.HttpListener.GetVirtualHosts() {
+			for j, vh := range listener.HttpListener.GetVirtualHosts() {
 				routeReports := make([]*validation.RouteReport, len(vh.GetRoutes()))
 				for k := range vh.GetRoutes() {
 					routeReports[k] = &validation.RouteReport{}
@@ -37,9 +35,11 @@ func MakeReport(proxy *v1.Proxy) *validation.ProxyReport {
 					},
 				},
 			}
-		case *v1.Listener_TcpListener:
-			tcpHostReports := make([]*validation.TcpHostReport, len(listenerType.TcpListener.GetTcpHosts()))
-			for j := range listenerType.TcpListener.GetTcpHosts() {
+		}
+
+		if listener.TcpListener != nil {
+			tcpHostReports := make([]*validation.TcpHostReport, len(listener.TcpListener.GetTcpHosts()))
+			for j := range listener.TcpListener.GetTcpHosts() {
 				tcpHostReports[j] = &validation.TcpHostReport{}
 			}
 			listenerReports[i] = &validation.ListenerReport{

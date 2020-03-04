@@ -5,6 +5,9 @@
 ROOTDIR := $(shell pwd)
 OUTPUT_DIR ?= $(ROOTDIR)/_output
 
+# If you just put your username, then that refers to your account at hub.docker.com
+IMAGE_REPO := camelcasenotation
+
 # Kind of a hack to make sure _output exists
 z := $(shell mkdir -p $(OUTPUT_DIR))
 
@@ -220,7 +223,7 @@ $(OUTPUT_DIR)/Dockerfile.gateway: $(GATEWAY_DIR)/cmd/Dockerfile
 
 gateway-docker: $(OUTPUT_DIR)/gateway-linux-amd64 $(OUTPUT_DIR)/Dockerfile.gateway
 	docker build $(OUTPUT_DIR) -f $(OUTPUT_DIR)/Dockerfile.gateway \
-		-t quay.io/solo-io/gateway:$(VERSION)
+		-t $(IMAGE_REPO)/gateway:$(VERSION)
 
 #----------------------------------------------------------------------------------
 # Ingress
@@ -301,7 +304,7 @@ $(OUTPUT_DIR)/Dockerfile.gloo: $(GLOO_DIR)/cmd/Dockerfile
 
 gloo-docker: $(OUTPUT_DIR)/gloo-linux-amd64 $(OUTPUT_DIR)/Dockerfile.gloo
 	docker build $(OUTPUT_DIR) -f $(OUTPUT_DIR)/Dockerfile.gloo \
-		-t quay.io/solo-io/gloo:$(VERSION)
+		-t camelcasenotation/gloo:$(VERSION)
 
 #----------------------------------------------------------------------------------
 # SDS Server - gRPC server for serving Secret Discovery Service config for Gloo MTLS

@@ -52,7 +52,7 @@ message Proxy {
 }
 
 // Listeners define the address:port where the proxy will listen for incoming connections
-// A Listener accepts connections (currently only HTTP is supported) and apply user-defined behavior for those connections,
+// A Listener accepts connections and apply user-defined behavior for those connections,
 // e.g. performing SSL termination, HTTP retries, and rate limiting.
 message Listener {
     // the name of the listener. names must be unique for each listener within a proxy
@@ -66,16 +66,14 @@ message Listener {
     // ports numbers must be unique for listeners within a proxy
     uint32 bind_port = 3;
 
-    // Listeners can listen for HTTP, TCP (unsupported), and UDP (unsupported) connections
-    oneof ListenerType {
-        // The HTTP Listener is currently the only supported listener type.
-        // It contains configuration options for Gloo's HTTP-level features including request-based routing
-        HttpListener http_listener = 4;
+    // Listeners can listen for HTTP, TCP, and UDP (unsupported) connections
+    //ListenerType {
+    // The HTTP Listener contains configuration options for Gloo's HTTP-level features including request-based routing
+    HttpListener http_listener = 4;
 
-        // The HTTP Listener is currently the only supported listener type.
-        // It contains configuration options for GLoo's HTTP-level features including request-based routing
-        TcpListener tcp_listener = 5;
-    }
+    // The TCP Listener contains configuration options for Gloo's TCP-level features including SNI-based routing
+    TcpListener tcp_listener = 5;
+    //}
 
     // SSL Config is optional for the listener. If provided, the listener will serve TLS for connections on this port.
     // Multiple SslConfigs are supported for the purpose of SNI. Be aware that the SNI domain provided in the SSL Config

@@ -94,46 +94,38 @@ func (m *Gateway) Hash(hasher hash.Hash64) (uint64, error) {
 		}
 	}
 
+	if h, ok := interface{}(m.GetHttpGateway()).(safe_hasher.SafeHasher); ok {
+		if _, err = h.Hash(hasher); err != nil {
+			return 0, err
+		}
+	} else {
+		if val, err := hashstructure.Hash(m.GetHttpGateway(), nil); err != nil {
+			return 0, err
+		} else {
+			if err := binary.Write(hasher, binary.LittleEndian, val); err != nil {
+				return 0, err
+			}
+		}
+	}
+
+	if h, ok := interface{}(m.GetTcpGateway()).(safe_hasher.SafeHasher); ok {
+		if _, err = h.Hash(hasher); err != nil {
+			return 0, err
+		}
+	} else {
+		if val, err := hashstructure.Hash(m.GetTcpGateway(), nil); err != nil {
+			return 0, err
+		} else {
+			if err := binary.Write(hasher, binary.LittleEndian, val); err != nil {
+				return 0, err
+			}
+		}
+	}
+
 	for _, v := range m.GetProxyNames() {
 
 		if _, err = hasher.Write([]byte(v)); err != nil {
 			return 0, err
-		}
-
-	}
-
-	switch m.GatewayType.(type) {
-
-	case *Gateway_HttpGateway:
-
-		if h, ok := interface{}(m.GetHttpGateway()).(safe_hasher.SafeHasher); ok {
-			if _, err = h.Hash(hasher); err != nil {
-				return 0, err
-			}
-		} else {
-			if val, err := hashstructure.Hash(m.GetHttpGateway(), nil); err != nil {
-				return 0, err
-			} else {
-				if err := binary.Write(hasher, binary.LittleEndian, val); err != nil {
-					return 0, err
-				}
-			}
-		}
-
-	case *Gateway_TcpGateway:
-
-		if h, ok := interface{}(m.GetTcpGateway()).(safe_hasher.SafeHasher); ok {
-			if _, err = h.Hash(hasher); err != nil {
-				return 0, err
-			}
-		} else {
-			if val, err := hashstructure.Hash(m.GetTcpGateway(), nil); err != nil {
-				return 0, err
-			} else {
-				if err := binary.Write(hasher, binary.LittleEndian, val); err != nil {
-					return 0, err
-				}
-			}
 		}
 
 	}

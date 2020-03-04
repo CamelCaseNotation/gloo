@@ -21,10 +21,8 @@ func DefaultGateway(writeNamespace string) *v1.Gateway {
 			Namespace:   writeNamespace,
 			Annotations: map[string]string{defaults.OriginKey: defaults.DefaultValue},
 		},
-		ProxyNames: []string{GatewayProxyName},
-		GatewayType: &v1.Gateway_HttpGateway{
-			HttpGateway: &v1.HttpGateway{},
-		},
+		ProxyNames:    []string{GatewayProxyName},
+		HttpGateway:   &v1.HttpGateway{},
 		BindAddress:   GatewayBindAddress,
 		BindPort:      defaults.HttpPort,
 		UseProxyProto: &types.BoolValue{Value: false},
@@ -49,9 +47,7 @@ func DefaultTcpGateway(writeNamespace string) *v1.Gateway {
 			Namespace:   writeNamespace,
 			Annotations: map[string]string{defaults.OriginKey: defaults.DefaultValue},
 		},
-		GatewayType: &v1.Gateway_TcpGateway{
-			TcpGateway: &v1.TcpGateway{},
-		},
+		TcpGateway:    &v1.TcpGateway{},
 		ProxyNames:    []string{GatewayProxyName},
 		BindAddress:   GatewayBindAddress,
 		BindPort:      defaults.TcpPort,

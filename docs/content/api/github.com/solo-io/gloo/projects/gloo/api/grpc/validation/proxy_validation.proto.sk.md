@@ -147,8 +147,8 @@ If the report contains no errors, the (sub-)resource is valid.
 | Field | Type | Description | Default |
 | ----- | ---- | ----------- |----------- | 
 | `errors` | [[]gloo.solo.io.ListenerReport.Error](../proxy_validation.proto.sk/#error) | errors on top-level config of the listener. |  |
-| `httpListenerReport` | [.gloo.solo.io.HttpListenerReport](../proxy_validation.proto.sk/#httplistenerreport) | report for the http listener. Only one of `httpListenerReport` or `tcpListenerReport` can be set. |  |
-| `tcpListenerReport` | [.gloo.solo.io.TcpListenerReport](../proxy_validation.proto.sk/#tcplistenerreport) | report for the tcp listener. Only one of `tcpListenerReport` or `httpListenerReport` can be set. |  |
+| `httpListenerReport` | [.gloo.solo.io.HttpListenerReport](../proxy_validation.proto.sk/#httplistenerreport) | report for the http listener. |  |
+| `tcpListenerReport` | [.gloo.solo.io.TcpListenerReport](../proxy_validation.proto.sk/#tcplistenerreport) | report for the tcp listener. |  |
 
 
 

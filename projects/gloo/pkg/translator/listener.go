@@ -24,15 +24,15 @@ func (t *translatorInstance) computeListener(params plugins.Params, proxy *v1.Pr
 
 	validateListenerPorts(proxy, listenerReport)
 	var filterChains []*envoylistener.FilterChain
-	switch listener.GetListenerType().(type) {
-	case *v1.Listener_HttpListener:
+	if listener.HttpListener != nil {
 		// run the http filter chain plugins and listener plugins
 		listenerFilters := t.computeListenerFilters(params, listener, listenerReport)
 		if len(listenerFilters) == 0 {
 			return nil
 		}
 		filterChains = t.computeFilterChainsFromSslConfig(params.Snapshot, listener, listenerFilters, listenerReport)
-	case *v1.Listener_TcpListener:
+	}
+	if listener.TcpListener != nil {
 		// run the tcp filter chain plugins
 		for _, plug := range t.plugins {
 			listenerPlugin, ok := plug.(plugins.ListenerFilterChainPlugin)
@@ -103,8 +103,7 @@ func (t *translatorInstance) computeListenerFilters(params plugins.Params, liste
 	}
 
 	// return if listener type != http || no virtual hosts
-	httpListener, ok := listener.ListenerType.(*v1.Listener_HttpListener)
-	if !ok || len(httpListener.HttpListener.VirtualHosts) == 0 {
+	if listener.HttpListener == nil || len(listener.HttpListener.VirtualHosts) == 0 {
 		return nil
 	}
 
@@ -115,7 +114,7 @@ func (t *translatorInstance) computeListenerFilters(params plugins.Params, liste
 
 	// add the http connection manager filter after all the InAuth Listener Filters
 	rdsName := routeConfigName(listener)
-	httpConnMgr := t.computeHttpConnectionManagerFilter(params, httpListener.HttpListener, rdsName, httpListenerReport)
+	httpConnMgr := t.computeHttpConnectionManagerFilter(params, listener.HttpListener, rdsName, httpListenerReport)
 	listenerFilters = append(listenerFilters, plugins.StagedListenerFilter{
 		ListenerFilter: httpConnMgr,
 		Stage:          plugins.AfterStage(plugins.AuthZStage),
@@ -225,6 +224,10 @@ func newSslFilterChain(downstreamConfig *envoyauth.DownstreamTlsContext, sniDoma
 	return &envoylistener.FilterChain{
 		FilterChainMatch: &envoylistener.FilterChainMatch{
 			ServerNames: sniDomains,
+			ApplicationProtocols: []string{
+				"h2",
+				"http1.1",
+			},
 		},
 		Filters: listenerFilters,
 

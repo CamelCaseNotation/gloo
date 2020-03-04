@@ -75,7 +75,7 @@ Node ID can be specified in Envoy with the `--service-node` flag, or in the Envo
 
  
 Listeners define the address:port where the proxy will listen for incoming connections
-A Listener accepts connections (currently only HTTP is supported) and apply user-defined behavior for those connections,
+A Listener accepts connections and apply user-defined behavior for those connections,
 e.g. performing SSL termination, HTTP retries, and rate limiting.
 
 ```yaml
@@ -96,8 +96,8 @@ e.g. performing SSL termination, HTTP retries, and rate limiting.
 | `name` | `string` | the name of the listener. names must be unique for each listener within a proxy. |  |
 | `bindAddress` | `string` | the bind address for the listener. both ipv4 and ipv6 formats are supported. |  |
 | `bindPort` | `int` | the port to bind on ports numbers must be unique for listeners within a proxy. |  |
-| `httpListener` | [.gloo.solo.io.HttpListener](../proxy.proto.sk/#httplistener) | The HTTP Listener is currently the only supported listener type. It contains configuration options for Gloo's HTTP-level features including request-based routing. Only one of `httpListener` or `tcpListener` can be set. |  |
-| `tcpListener` | [.gloo.solo.io.TcpListener](../proxy.proto.sk/#tcplistener) | The HTTP Listener is currently the only supported listener type. It contains configuration options for GLoo's HTTP-level features including request-based routing. Only one of `tcpListener` or `httpListener` can be set. |  |
+| `httpListener` | [.gloo.solo.io.HttpListener](../proxy.proto.sk/#httplistener) | Listeners can listen for HTTP, TCP, and UDP (unsupported) connections ListenerType { The HTTP Listener contains configuration options for Gloo's HTTP-level features including request-based routing. |  |
+| `tcpListener` | [.gloo.solo.io.TcpListener](../proxy.proto.sk/#tcplistener) | The TCP Listener contains configuration options for Gloo's TCP-level features including SNI-based routing. |  |
 | `sslConfigurations` | [[]gloo.solo.io.SslConfig](../ssl.proto.sk/#sslconfig) | SSL Config is optional for the listener. If provided, the listener will serve TLS for connections on this port. Multiple SslConfigs are supported for the purpose of SNI. Be aware that the SNI domain provided in the SSL Config. |  |
 | `useProxyProto` | [.google.protobuf.BoolValue](https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/bool-value) | Enable ProxyProtocol support for this listener. |  |
 | `options` | [.gloo.solo.io.ListenerOptions](../options.proto.sk/#listeneroptions) | top level options. |  |

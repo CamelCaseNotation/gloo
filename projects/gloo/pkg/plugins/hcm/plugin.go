@@ -45,14 +45,10 @@ func (p *Plugin) RegisterHcmPlugins(allPlugins []plugins.Plugin) {
 // 1. apply the core HCM settings from the HCM plugin to the listener
 // 2. call each of the HCM plugins to make sure that they have a chance to apply their modifications to the listener
 func (p *Plugin) ProcessListener(params plugins.Params, in *v1.Listener, out *envoyapi.Listener) error {
-	hl, ok := in.ListenerType.(*v1.Listener_HttpListener)
-	if !ok {
+	if in.HttpListener == nil {
 		return nil
 	}
-	if hl.HttpListener == nil {
-		return nil
-	}
-	hcmSettings := hl.HttpListener.GetOptions().GetHttpConnectionManagerSettings()
+	hcmSettings := in.HttpListener.GetOptions().GetHttpConnectionManagerSettings()
 	for _, f := range out.FilterChains {
 		for i, filter := range f.Filters {
 			if filter.Name == util.HTTPConnectionManager {
